@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LIV Loan Follow</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --primary: #5c0613;
+    --primary-light: #8b0e1f;
+    --accent: #e8a020;
+    --accent-light: #fef3dc;
+    --success: #16a34a;
+    --success-light: #dcfce7;
+    --danger: #dc2626;
+    --danger-light: #fee2e2;
+    --warning: #d97706;
+    --warning-light: #fef3c7;
+    --surface: #ffffff;
+    --surface2: #f8f9fb;
+    --surface3: #f0f2f5;
+    --border: #e2e8f0;
+    --text1: #0f172a;
+    --text2: #475569;
+    --text3: #94a3b8;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  body {
+    font-family: 'Sarabun', sans-serif;
+    background: var(--surface3);
+    color: var(--text1);
+    min-height: 100vh;
+    font-size: 15px;
+  }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ===== LOGIN ===== */
+  #page-login {
+    min-height: 100vh;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(145deg, #2a0009 0%, #5c0613 50%, #2a0009 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  #page-login.active { display: flex; }
+  #page-login::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.05);
+    top: -200px; right: -200px;
+  }
+  #page-login::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.05);
+    bottom: -100px; left: -100px;
+  }
+  .login-box {
+    background: rgba(255,255,255,0.97);
+    border-radius: 20px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .login-logo {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .login-logo .brand {
+    font-family: 'Prompt', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: -0.5px;
+  }
+  .login-logo .brand span { color: var(--accent); }
+  .login-logo .sub {
+    font-size: 13px;
+    color: var(--text3);
+    margin-top: 4px;
+  }
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+    margin-bottom: 6px;
+  }
+  .form-group input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'Sarabun', sans-serif;
+    font-size: 15px;
+    color: var(--text1);
+    background: var(--surface);
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-group input:focus { border-color: var(--primary-light); }
+  .btn-login {
+    width: 100%;
+    padding: 14px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Sarabun', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s;
+  }
+  .btn-login:hover { background: var(--primary-light); }
+  .login-error {
+    background: var(--danger-light);
+    color: var(--danger);
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    margin-top: 12px;
+    display: none;
+  }
+  .demo-hint {
+    margin-top: 20px;
+    padding: 12px;
+    background: var(--surface3);
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    color: var(--text3);
+    line-height: 1.6;
+  }
+  .demo-hint strong { color: var(--text2); }
+
+  /* ===== TOPBAR ===== */
+  .topbar {
+    background: var(--primary);
+    color: white;
+    padding: 0 24px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topbar-brand {
+    font-family: 'Prompt', sans-serif;
+    font-size: 18px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    color: white;
+  }
+  .topbar-brand .liv { color: var(--accent); font-weight: 400; }
+  .topbar-brand .lf { color: white; font-weight: 300; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .topbar-user {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+  }
+  .btn-logout {
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Sarabun', sans-serif;
+    transition: background 0.2s;
+  }
+  .btn-logout:hover { background: rgba(255,255,255,0.2); }
+
+  /* ===== ADMIN DASHBOARD ===== */
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+  .page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .page-title { font-family: 'Prompt', sans-serif; font-size: 20px; font-weight: 600; color: var(--text1); }
+  .page-sub { font-size: 13px; color: var(--text3); margin-top: 2px; }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    border: 1px solid var(--border);
+  }
+  .stat-card .label { font-size: 12px; color: var(--text3); margin-bottom: 8px; }
+  .stat-card .value { font-size: 26px; font-weight: 700; font-family: 'Prompt', sans-serif; color: var(--text1); }
+  .stat-card .sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+  .stat-card.danger .value { color: var(--danger); }
+  .stat-card.success .value { color: var(--success); }
+  .stat-card.accent .value { color: var(--accent); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    border: 1px solid var(--border);
+  }
+  .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text1);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Customer List */
+  .customer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .customer-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+  }
+  .customer-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    border-color: var(--primary-light);
+  }
+  .customer-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px;
+    flex-shrink: 0;
+  }
+  .customer-name { font-weight: 600; font-size: 15px; color: var(--text1); }
+  .customer-phone { font-size: 12px; color: var(--text3); }
+  .progress-wrap { margin-bottom: 10px; }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: var(--text2); margin-bottom: 4px;
+  }
+  .progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--primary-light);
+    border-radius: 4px;
+    transition: width 0.5s;
+  }
+  .customer-meta { display: flex; justify-content: space-between; align-items: center; }
+  .badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-success { background: var(--success-light); color: var(--success); }
+  .badge-danger { background: var(--danger-light); color: var(--danger); }
+  .badge-warning { background: var(--warning-light); color: var(--warning); }
+  .remaining { font-size: 12px; color: var(--text3); }
+
+  /* ===== CUSTOMER DETAIL ===== */
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text2);
+    font-size: 14px;
+    cursor: pointer;
+    font-family: 'Sarabun', sans-serif;
+    transition: background 0.2s;
+    margin-bottom: 20px;
+  }
+  .btn-back:hover { background: var(--surface2); }
+
+  .ownership-card {
+    background: var(--primary);
+    border-radius: var(--radius);
+    padding: 28px;
+    color: white;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .ownership-card::before {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.08);
+    top: -100px; right: -100px;
+  }
+  .ownership-top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .ownership-name { font-size: 20px; font-weight: 700; font-family: 'Prompt', sans-serif; }
+  .ownership-phone { font-size: 13px; opacity: 0.7; margin-top: 2px; }
+  .ownership-pct { text-align: right; }
+  .ownership-pct .big { font-size: 48px; font-weight: 700; font-family: 'Prompt', sans-serif; color: var(--accent); line-height: 1; }
+  .ownership-pct .lbl { font-size: 12px; opacity: 0.7; margin-top: 2px; }
+  .ownership-bar {
+    margin-top: 20px;
+    height: 10px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .ownership-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 6px;
+  }
+  .ownership-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .ownership-stat .lbl { font-size: 11px; opacity: 0.6; margin-bottom: 4px; }
+  .ownership-stat .val { font-size: 15px; font-weight: 600; }
+
+  .action-row { display: flex; gap: 12px; margin-bottom: 20px; }
+  .btn-action {
+    flex: 1;
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    font-family: 'Sarabun', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 0.2s;
+  }
+  .btn-action:hover { opacity: 0.85; }
+  .btn-pay { background: var(--success); color: white; }
+  .btn-prepay { background: var(--accent); color: white; }
+  .btn-line { background: var(--surface); color: var(--primary); border: 1px solid var(--border); }
+
+  /* Payment Table */
+  .payments-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .payments-table th {
+    text-align: left;
+    padding: 10px 12px;
+    background: var(--surface2);
+    color: var(--text3);
+    font-weight: 500;
+    font-size: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .payments-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text1);
+  }
+  .payments-table tr:last-child td { border-bottom: none; }
+  .payments-table tr.overdue td { background: #fff8f8; }
+  .payments-table tr.paid td { opacity: 0.6; }
+  .payments-table tr.current { background: #f0f7ff; }
+
+  /* Modal */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: white;
+    border-radius: var(--radius);
+    padding: 28px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+  .modal-title { font-size: 18px; font-weight: 700; font-family: 'Prompt', sans-serif; margin-bottom: 16px; }
+  .modal-body { font-size: 14px; color: var(--text2); line-height: 1.7; margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 10px; }
+  .btn-confirm {
+    flex: 1; padding: 12px;
+    background: var(--success); color: white;
+    border: none; border-radius: var(--radius-sm);
+    font-family: 'Sarabun', sans-serif; font-size: 14px; font-weight: 600;
+    cursor: pointer;
+  }
+  .btn-cancel {
+    flex: 1; padding: 12px;
+    background: var(--surface); color: var(--text2);
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    font-family: 'Sarabun', sans-serif; font-size: 14px;
+    cursor: pointer;
+  }
+  .prepay-input { width: 100%; padding: 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'Sarabun', sans-serif; font-size: 15px; margin: 12px 0; outline: none; }
+  .prepay-input:focus { border-color: var(--primary-light); }
+
+  /* Customer own view */
+  .customer-own-header {
+    background: var(--primary);
+    color: white;
+    padding: 28px 24px;
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 700px) {
+    .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    .grid-2 { grid-template-columns: 1fr; }
+    .customer-grid { grid-template-columns: 1fr; }
+    .ownership-stats { grid-template-columns: repeat(2, 1fr); }
+    .action-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="page-login" class="page active">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="brand">LIV <span>Loan</span> Follow</div>
+      <div class="sub">ระบบติดตามการผ่อนชำระบ้าน</div>
+    </div>
+    <div class="form-group">
+      <label>เบอร์มือถือ</label>
+      <input type="text" id="inp-phone" placeholder="0812345678" maxlength="10">
+    </div>
+    <div class="form-group">
+      <label>รหัสผ่าน</label>
+      <input type="password" id="inp-pass" placeholder="••••••••">
+    </div>
+    <button class="btn-login" onclick="doLogin()">เข้าสู่ระบบ</button>
+    <div class="login-error" id="login-error">เบอร์มือถือหรือรหัสผ่านไม่ถูกต้อง</div>
+
+  </div>
+</div>
+
+<!-- ===== ADMIN DASHBOARD ===== -->
+<div id="page-admin" class="page">
+  <div class="topbar">
+    <div class="topbar-brand"><span class="liv">LIV</span> <span class="lf">Loan Follow</span></div>
+    <div class="topbar-right">
+      <span class="topbar-user">แอดมิน</span>
+      <button class="btn-logout" onclick="doLogout()"><i class="ti ti-logout"></i> ออกจากระบบ</button>
+    </div>
+  </div>
+  <div class="container">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Dashboard ภาพรวม</div>
+        <div class="page-sub" id="admin-date"></div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-card">
+        <div class="label">ลูกค้าทั้งหมด</div>
+        <div class="value" id="stat-total">3</div>
+        <div class="sub">ราย</div>
+      </div>
+      <div class="stat-card success">
+        <div class="label">ผ่อนปกติ</div>
+        <div class="value" id="stat-ok">2</div>
+        <div class="sub">ราย</div>
+      </div>
+      <div class="stat-card danger">
+        <div class="label">ค้างชำระ</div>
+        <div class="value" id="stat-overdue">1</div>
+        <div class="sub">ราย</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-chart-pie" aria-hidden="true"></i> สถานะการชำระ</div>
+        <canvas id="chart-status" height="200"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-chart-bar" aria-hidden="true"></i> Top 3 % ความเป็นเจ้าของ</div>
+        <canvas id="chart-top" height="200"></canvas>
+      </div>
+    </div>
+
+    <!-- Search + Customer Cards -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+      <div class="card-title" style="margin:0;">
+        <i class="ti ti-users" aria-hidden="true"></i> รายชื่อลูกค้า — คลิกเพื่อดูรายละเอียด
+      </div>
+      <div style="position:relative;">
+        <i class="ti ti-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:15px;"></i>
+        <input type="text" id="search-customer" placeholder="ค้นหาชื่อ, เบอร์, หรือเลข บัตรปชช..." oninput="filterCustomers()"
+          style="padding:8px 12px 8px 32px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Sarabun',sans-serif;font-size:14px;width:260px;outline:none;color:var(--text1);">
+      </div>
+    </div>
+    <div class="customer-grid" id="customer-grid"></div>
+    <div id="pagination-wrap" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:20px;"></div>
+  </div>
+</div>
+
+<!-- ===== CUSTOMER DETAIL (Admin view) ===== -->
+<div id="page-detail" class="page">
+  <div class="topbar">
+    <div class="topbar-brand"><span class="liv">LIV</span> <span class="lf">Loan Follow</span></div>
+    <div class="topbar-right">
+      <button class="btn-logout" onclick="doLogout()"><i class="ti ti-logout"></i> ออกจากระบบ</button>
+    </div>
+  </div>
+  <div class="container">
+    <button class="btn-back" onclick="showPage('page-admin')"><i class="ti ti-arrow-left"></i> กลับหน้าภาพรวม</button>
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+<!-- ===== CUSTOMER OWN VIEW ===== -->
+<div id="page-customer" class="page">
+  <div class="topbar">
+    <div class="topbar-brand"><span class="liv">LIV</span> <span class="lf">Loan Follow</span></div>
+    <div class="topbar-right">
+      <button class="btn-logout" onclick="doLogout()"><i class="ti ti-logout"></i> ออกจากระบบ</button>
+    </div>
+  </div>
+  <div class="container">
+    <div id="customer-content"></div>
+  </div>
+</div>
+
+<!-- ===== MODALS ===== -->
+<div class="modal-bg" id="modal-logout">
+  <div class="modal">
+    <div class="modal-title">ออกจากระบบ</div>
+    <div class="modal-body">คุณต้องการออกจากระบบใช่ไหม?</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-logout')">ยกเลิก</button>
+      <button class="btn-confirm" style="background:var(--primary);" onclick="confirmLogout()">ออกจากระบบ</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-pay">
+  <div class="modal">
+    <div class="modal-title">✅ ยืนยันการชำระ</div>
+    <div class="modal-body" id="modal-pay-body"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-pay')">ยกเลิก</button>
+      <button class="btn-confirm" onclick="confirmPay()">ยืนยัน จ่ายแล้ว</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-prepay">
+  <div class="modal">
+    <div class="modal-title">💰 โป๊ะเงินต้น</div>
+    <div class="modal-body">
+      กรุณากรอกจำนวนเงินที่ต้องการโป๊ะต้นเพิ่มเติม
+      <input type="number" class="prepay-input" id="prepay-amount" placeholder="เช่น 50000">
+      <div style="font-size:12px;color:#94a3b8;">เงินต้นจะลดลงทันที และ % ความเป็นเจ้าของจะเพิ่มขึ้น</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('modal-prepay')">ยกเลิก</button>
+      <button class="btn-confirm" style="background:var(--accent);" onclick="confirmPrepay()">ยืนยันโป๊ะต้น</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== DATA =====
+const DB = {
+  users: [
+    { phone: '0800000000', password: 'admin123', role: 'admin', name: 'แอดมิน', status: 'active', nationalId: '' },
+    { phone: '0812345678', password: 'pass001', role: 'customer', name: 'สมชาย มีสุข', status: 'active', nationalId: '1100100012345' },
+    { phone: '0898765432', password: 'pass002', role: 'customer', name: 'วิภา ใจดี', status: 'active', nationalId: '1100200023456' },
+    { phone: '0856789012', password: 'pass003', role: 'customer', name: 'ประเสริฐ ทองดี', status: 'active', nationalId: '1100300034567' },
+  ],
+  contracts: [
+    { phone: '0812345678', name: 'สมชาย มีสุข', nationalId: '1100100012345', price: 3000000, down: 300000, rate: 6.5, years: 30, start: '2020-01-01' },
+    { phone: '0898765432', name: 'วิภา ใจดี', nationalId: '1100200023456', price: 2500000, down: 250000, rate: 5.75, years: 25, start: '2021-06-01' },
+    { phone: '0856789012', name: 'ประเสริฐ ทองดี', nationalId: '1100300034567', price: 1800000, down: 180000, rate: 6.0, years: 20, start: '2019-03-01' },
+  ],
+  payments: generatePayments()
+};
+
+function generatePayments() {
+  const payments = [];
+  const contracts = [
+    { phone: '0812345678', price: 3000000, down: 300000, rate: 6.5, years: 30, start: '2020-01-01' },
+    { phone: '0898765432', price: 2500000, down: 250000, rate: 5.75, years: 25, start: '2021-06-01' },
+    { phone: '0856789012', price: 1800000, down: 180000, rate: 6.0, years: 20, start: '2019-03-01' },
+  ];
+  contracts.forEach(c => {
+    const principal = c.price - c.down;
+    const monthlyRate = c.rate / 100 / 12;
+    const months = c.years * 12;
+    const monthlyPayment = principal * (monthlyRate * Math.pow(1+monthlyRate,months)) / (Math.pow(1+monthlyRate,months)-1);
+    let balance = principal;
+    const startDate = new Date(c.start);
+    const today = new Date();
+    let totalPrincipalPaid = 0;
+    for (let i = 1; i <= months; i++) {
+      const dueDate = new Date(startDate);
+      dueDate.setMonth(dueDate.getMonth() + i);
+      const interest = balance * monthlyRate;
+      const prinPart = monthlyPayment - interest;
+      balance -= prinPart;
+      totalPrincipalPaid += prinPart;
+      const pct = ((totalPrincipalPaid + c.down) / c.price * 100).toFixed(1);
+      let status = 'upcoming';
+      let paidDate = null;
+      if (dueDate < today) {
+        if (c.phone === '0856789012' && i >= Math.floor((today - new Date(c.start)) / (1000*60*60*24*30)) - 1) {
+          status = 'overdue';
+        } else {
+          status = 'paid';
+          paidDate = new Date(dueDate);
+          paidDate.setDate(paidDate.getDate() - Math.floor(Math.random()*5));
+        }
+      } else if (i === getNextInstallment(c.phone, new Date(c.start), today)) {
+        status = 'current';
+      }
+      payments.push({
+        phone: c.phone, installment: i,
+        due: dueDate.toISOString().split('T')[0],
+        principal: Math.round(prinPart),
+        interest: Math.round(interest),
+        total: Math.round(monthlyPayment),
+        prepay: 0,
+        status,
+        paidDate: paidDate ? paidDate.toISOString().split('T')[0] : null,
+        ownerPct: parseFloat(pct),
+        note: ''
+      });
+      if (balance <= 0) break;
+    }
+  });
+  return payments;
+}
+
+function getNextInstallment(phone, start, today) {
+  const diff = (today - start) / (1000*60*60*24*30);
+  return Math.floor(diff) + 1;
+}
+
+// ===== STATE =====
+let currentUser = null;
+let currentDetailPhone = null;
+let pendingPayPhone = null;
+let pendingPayInstallment = null;
+
+// ===== AUTH =====
+function doLogin() {
+  const phone = document.getElementById('inp-phone').value.trim();
+  const pass = document.getElementById('inp-pass').value.trim();
+  const user = DB.users.find(u => u.phone === phone && u.password === pass && u.status === 'active');
+  if (!user) {
+    document.getElementById('login-error').style.display = 'block';
+    return;
+  }
+  document.getElementById('login-error').style.display = 'none';
+  currentUser = user;
+  if (user.role === 'admin') {
+    renderAdmin();
+    showPage('page-admin');
+  } else {
+    renderCustomer(user.phone);
+    showPage('page-customer');
+  }
+}
+
+document.getElementById('inp-pass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+
+function doLogout() {
+  document.getElementById('modal-logout').classList.add('open');
+}
+
+function confirmLogout() {
+  closeModal('modal-logout');
+  currentUser = null;
+  document.getElementById('inp-phone').value = '';
+  document.getElementById('inp-pass').value = '';
+  showPage('page-login');
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ===== ADMIN =====
+let adminPage = 1;
+const PAGE_SIZE = 10;
+let filteredContracts = [];
+
+function renderAdmin() {
+  const now = new Date();
+  document.getElementById('admin-date').textContent = now.toLocaleDateString('th-TH', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  // Update stats dynamically
+  const totalCustomers = DB.contracts.length;
+  const overdueCustomers = DB.contracts.filter(c => DB.payments.some(p => p.phone===c.phone && p.status==='overdue')).length;
+  document.getElementById('stat-total').textContent = totalCustomers;
+  document.getElementById('stat-ok').textContent = totalCustomers - overdueCustomers;
+  document.getElementById('stat-overdue').textContent = overdueCustomers;
+
+  // Charts
+  setTimeout(() => {
+    const ctx1 = document.getElementById('chart-status').getContext('2d');
+    new Chart(ctx1, {
+      type: 'doughnut',
+      data: {
+        labels: ['ผ่อนปกติ','ค้างชำระ'],
+        datasets: [{ data: [totalCustomers - overdueCustomers, overdueCustomers], backgroundColor: ['#16a34a','#dc2626'], borderWidth: 0 }]
+      },
+      options: { responsive:true, plugins:{ legend:{ position:'bottom', labels:{ font:{family:'Sarabun',size:12} } } } }
+    });
+    const ctx2 = document.getElementById('chart-top').getContext('2d');
+    const topData = DB.contracts.map(c => {
+      const pmts = DB.payments.filter(p => p.phone === c.phone && p.status === 'paid');
+      const lastPaid = pmts[pmts.length-1];
+      return { name: c.name.split(' ')[0], pct: lastPaid ? lastPaid.ownerPct : 0 };
+    }).sort((a,b) => b.pct - a.pct);
+    new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: topData.map(d => d.name),
+        datasets: [{ label:'% ความเป็นเจ้าของ', data: topData.map(d => d.pct), backgroundColor: '#8b0e1f', borderRadius: 6 }]
+      },
+      options: { responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ max:100, ticks:{ callback:v=>v+'%' } } } }
+    });
+  }, 100);
+
+  filteredContracts = [...DB.contracts];
+  adminPage = 1;
+  renderCustomerGrid();
+}
+
+function filterCustomers() {
+  const q = document.getElementById('search-customer').value.trim().toLowerCase();
+  filteredContracts = DB.contracts.filter(c =>
+    c.name.toLowerCase().includes(q) ||
+    c.phone.includes(q) ||
+    (c.nationalId && c.nationalId.includes(q))
+  );
+  adminPage = 1;
+  renderCustomerGrid();
+}
+
+function renderCustomerGrid() {
+  const grid = document.getElementById('customer-grid');
+  const paginationWrap = document.getElementById('pagination-wrap');
+  grid.innerHTML = '';
+
+  const totalPages = Math.ceil(filteredContracts.length / PAGE_SIZE);
+  const start = (adminPage - 1) * PAGE_SIZE;
+  const pageItems = filteredContracts.slice(start, start + PAGE_SIZE);
+
+  if (pageItems.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3);font-size:14px;">ไม่พบลูกค้าที่ค้นหา</div>';
+    paginationWrap.innerHTML = '';
+    return;
+  }
+
+  pageItems.forEach(c => {
+    const pmts = DB.payments.filter(p => p.phone === c.phone);
+    const paid = pmts.filter(p => p.status === 'paid');
+    const overdue = pmts.filter(p => p.status === 'overdue');
+    const lastPaid = paid[paid.length-1];
+    const pct = lastPaid ? lastPaid.ownerPct : (c.down/c.price*100).toFixed(1);
+    const initials = c.name.split(' ').map(w=>w[0]).join('').slice(0,2);
+    const statusBadge = overdue.length > 0
+      ? `<span class="badge badge-danger">ค้างชำระ ${overdue.length} งวด</span>`
+      : `<span class="badge badge-success">ปกติ</span>`;
+    const remaining = c.years * 12 - paid.length;
+    const card = document.createElement('div');
+    card.className = 'customer-card';
+    card.innerHTML = `
+      <div class="customer-header">
+        <div class="avatar">${initials}</div>
+        <div>
+          <div class="customer-name">${c.name}</div>
+          <div class="customer-phone">${c.phone} &nbsp;|&nbsp; บัตร: ${c.nationalId ? c.nationalId.replace(/(\d{1})(\d{4})(\d{5})(\d{2})(\d{1})/, '$1-$2-$3-$4-$5') : '-'}</div>
+        </div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>ความเป็นเจ้าของ</span><span style="font-weight:600;color:var(--primary-light)">${pct}%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="customer-meta">
+        ${statusBadge}
+        <span class="remaining">เหลือ ${remaining.toLocaleString()} งวด</span>
+      </div>`;
+    card.onclick = () => {
+      currentDetailPhone = c.phone;
+      renderDetail(c.phone);
+      showPage('page-detail');
+    };
+    grid.appendChild(card);
+  });
+
+  // Pagination
+  paginationWrap.innerHTML = '';
+  if (totalPages <= 1) return;
+
+  const btnStyle = (active) => `padding:6px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);font-family:'Sarabun',sans-serif;font-size:13px;cursor:pointer;background:${active?'var(--primary)':'var(--surface)'};color:${active?'white':'var(--text2)'};`;
+
+  for (let i = 1; i <= totalPages; i++) {
+    const btn = document.createElement('button');
+    btn.textContent = i;
+    btn.style.cssText = btnStyle(i === adminPage);
+    btn.onclick = () => { adminPage = i; renderCustomerGrid(); };
+    paginationWrap.appendChild(btn);
+  }
+}
+
+// ===== DETAIL =====
+function renderDetail(phone) {
+  const contract = DB.contracts.find(c => c.phone === phone);
+  const pmts = DB.payments.filter(p => p.phone === phone);
+  const paid = pmts.filter(p => p.status === 'paid');
+  const overdue = pmts.filter(p => p.status === 'overdue');
+  const current = pmts.find(p => p.status === 'current');
+  const lastPaid = paid[paid.length-1];
+  const pct = lastPaid ? lastPaid.ownerPct : (contract.down/contract.price*100).toFixed(1);
+  const principal = contract.price - contract.down;
+  const totalPaid = paid.reduce((s,p) => s + p.total + p.prepay, 0);
+  const remaining = contract.years*12 - paid.length;
+  const initials = contract.name.split(' ').map(w=>w[0]).join('').slice(0,2);
+
+  // Overdue days
+  let overdueBadge = '';
+  if (overdue.length > 0) {
+    const dueDate = new Date(overdue[0].due);
+    const days = Math.floor((new Date() - dueDate) / (1000*60*60*24));
+    overdueBadge = `<div style="background:var(--danger-light);color:var(--danger);padding:10px 16px;border-radius:var(--radius-sm);margin-bottom:12px;font-size:13px;font-weight:600;"><i class="ti ti-alert-triangle"></i> ค้างชำระ ${overdue.length} งวด — เกินกำหนด ${days} วัน</div>`;
+  }
+
+  const payBtn = current
+    ? `<button class="btn-action btn-pay" onclick="openPayModal('${phone}',${current.installment})"><i class="ti ti-circle-check"></i> งวดที่ ${current.installment} — จ่ายแล้ว</button>`
+    : (overdue.length > 0
+      ? `<button class="btn-action btn-pay" onclick="openPayModal('${phone}',${overdue[0].installment})"><i class="ti ti-circle-check"></i> ชำระงวดค้าง #${overdue[0].installment}</button>`
+      : `<button class="btn-action btn-pay" disabled style="opacity:0.4;cursor:not-allowed"><i class="ti ti-circle-check"></i> ชำระแล้วทุกงวด</button>`);
+
+  // Payment rows (last 12 + upcoming 3)
+  const show = [...paid.slice(-8), ...pmts.filter(p=>p.status==='current'||p.status==='overdue'), ...pmts.filter(p=>p.status==='upcoming').slice(0,3)];
+  const rows = show.map(p => {
+    const cls = p.status==='overdue'?'overdue':p.status==='paid'?'paid':p.status==='current'?'current':'';
+    const statusTxt = p.status==='paid'?`<span class="badge badge-success">จ่ายแล้ว</span>`
+      :p.status==='overdue'?`<span class="badge badge-danger">ค้างชำระ</span>`
+      :p.status==='current'?`<span class="badge badge-warning">งวดนี้</span>`
+      :`<span style="font-size:11px;color:var(--text3)">รอชำระ</span>`;
+    const prepayTxt = p.prepay > 0 ? `<br><span style="font-size:11px;color:var(--accent)">+โป๊ะ ${p.prepay.toLocaleString()}</span>` : '';
+    return `<tr class="${cls}">
+      <td style="font-weight:600">#${p.installment}</td>
+      <td>${p.due}</td>
+      <td>${p.principal.toLocaleString()}</td>
+      <td>${p.interest.toLocaleString()}</td>
+      <td>${p.total.toLocaleString()}${prepayTxt}</td>
+      <td>${p.ownerPct}%</td>
+      <td>${statusTxt}</td>
+      <td style="color:var(--text3);font-size:12px">${p.paidDate||'-'}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('detail-content').innerHTML = `
+    ${overdueBadge}
+    <div class="ownership-card">
+      <div class="ownership-top">
+        <div>
+          <div class="ownership-name">${contract.name}</div>
+          <div class="ownership-phone"><i class="ti ti-phone"></i> ${contract.phone}</div>
+          <div class="ownership-phone" style="margin-top:2px;font-size:12px;opacity:0.6;">บัตรปชช: ${contract.nationalId ? contract.nationalId.replace(/(\d{1})(\d{4})(\d{5})(\d{2})(\d{1})/, '$1-$2-$3-$4-$5') : '-'}</div>
+        </div>
+        <div class="ownership-pct">
+          <div class="big">${pct}%</div>
+          <div class="lbl">ความเป็นเจ้าของ</div>
+        </div>
+      </div>
+      <div class="ownership-bar"><div class="ownership-bar-fill" style="width:${pct}%"></div></div>
+      <div class="ownership-stats">
+        <div class="ownership-stat"><div class="lbl">ราคาบ้าน</div><div class="val">${contract.price.toLocaleString()} ฿</div></div>
+        <div class="ownership-stat"><div class="lbl">จ่ายไปแล้ว</div><div class="val">${totalPaid.toLocaleString()} ฿</div></div>
+        <div class="ownership-stat"><div class="lbl">เหลืออีก</div><div class="val">${remaining.toLocaleString()} งวด</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i class="ti ti-list" aria-hidden="true"></i> ประวัติการชำระ</div>
+      <div style="overflow-x:auto">
+        <table class="payments-table">
+          <thead><tr>
+            <th>งวด</th><th>ครบกำหนด</th><th>เงินต้น</th><th>ดอกเบี้ย</th><th>ยอดรวม</th><th>% เจ้าของ</th><th>สถานะ</th><th>วันที่จ่าย</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ===== CUSTOMER OWN VIEW =====
+function renderCustomer(phone) {
+  currentDetailPhone = phone;
+  const contract = DB.contracts.find(c => c.phone === phone);
+  if (!contract) {
+    document.getElementById('customer-content').innerHTML = '<p style="padding:24px;color:var(--text3)">ไม่พบข้อมูล กรุณาติดต่อเจ้าหน้าที่</p>';
+    return;
+  }
+  // Reuse detail render
+  document.getElementById('customer-content').innerHTML = '';
+  const pmts = DB.payments.filter(p => p.phone === phone);
+  const paid = pmts.filter(p => p.status === 'paid');
+  const overdue = pmts.filter(p => p.status === 'overdue');
+  const current = pmts.find(p => p.status === 'current');
+  const lastPaid = paid[paid.length-1];
+  const pct = lastPaid ? lastPaid.ownerPct : (contract.down/contract.price*100).toFixed(1);
+  const totalPaid = paid.reduce((s,p) => s + p.total + p.prepay, 0);
+  const remaining = contract.years*12 - paid.length;
+
+  const today = new Date();
+  const todayStr = today.toLocaleDateString('th-TH', { year:'numeric', month:'long', day:'numeric' });
+
+  // Next due date info
+  const nextDue = overdue.length > 0 ? overdue[0] : current;
+  let dueBanner = '';
+  if (nextDue) {
+    const dueDate = new Date(nextDue.due);
+    const diffDays = Math.ceil((dueDate - today) / (1000*60*60*24));
+    if (overdue.length > 0) {
+      const overdueDays = Math.abs(diffDays);
+      dueBanner = `<div style="display:flex;align-items:center;justify-content:space-between;background:#fff8f8;border:1.5px solid #fca5a5;border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div style="font-size:13px;color:var(--text2);"><i class="ti ti-calendar" style="color:var(--text3)"></i> วันนี้ <strong style="color:var(--text1)">${todayStr}</strong></div>
+        <div style="font-size:13px;font-weight:700;color:var(--danger);"><i class="ti ti-alert-circle"></i> เลยกำหนด ${overdueDays} วัน (ครบ ${dueDate.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'})})</div>
+      </div>`;
+    } else {
+      const label = diffDays <= 0 ? 'ถึงกำหนดแล้ว!' : `อีก ${diffDays} วัน`;
+      const color = diffDays <= 7 ? 'var(--warning)' : 'var(--success)';
+      dueBanner = `<div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div style="font-size:13px;color:var(--text2);"><i class="ti ti-calendar" style="color:var(--text3)"></i> วันนี้ <strong style="color:var(--text1)">${todayStr}</strong></div>
+        <div style="font-size:13px;font-weight:700;color:${color};"><i class="ti ti-clock"></i> งวดถัดไป ${dueDate.toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'})} — <span style="color:${color}">${label}</span></div>
+      </div>`;
+    }
+  } else {
+    dueBanner = `<div style="display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:12px;">
+      <i class="ti ti-calendar" style="color:var(--text3)"></i>
+      <span style="font-size:13px;color:var(--text2)">วันนี้ <strong style="color:var(--text1)">${todayStr}</strong></span>
+    </div>`;
+  }
+
+  let overdueBadge = '';
+  if (overdue.length > 0) {
+    const days = Math.floor((today - new Date(overdue[0].due)) / (1000*60*60*24));
+    overdueBadge = `<div style="background:var(--danger-light);color:var(--danger);padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:12px;font-size:13px;font-weight:600;"><i class="ti ti-alert-triangle"></i> ค้างชำระ ${overdue.length} งวด — เกินกำหนด ${days} วัน กรุณาติดต่อเจ้าหน้าที่</div>`;
+  }
+
+  const payBtn = current
+    ? `<button class="btn-action btn-pay" onclick="openPayModal('${phone}',${current.installment})"><i class="ti ti-circle-check"></i> งวดที่ ${current.installment} — จ่ายแล้ว</button>`
+    : (overdue.length>0
+      ? `<button class="btn-action btn-pay" onclick="openPayModal('${phone}',${overdue[0].installment})"><i class="ti ti-circle-check"></i> ชำระงวดค้าง #${overdue[0].installment}</button>`
+      : `<button class="btn-action btn-pay" disabled style="opacity:0.4;cursor:not-allowed"><i class="ti ti-circle-check"></i> ชำระแล้วทุกงวด</button>`);
+
+  const show = [...paid.slice(-6), ...pmts.filter(p=>p.status==='current'||p.status==='overdue'), ...pmts.filter(p=>p.status==='upcoming').slice(0,3)];
+  const rows = show.map(p => {
+    const cls = p.status==='overdue'?'overdue':p.status==='paid'?'paid':p.status==='current'?'current':'';
+    const dueDate = new Date(p.due);
+    const diffDays = Math.ceil((dueDate - today) / (1000*60*60*24));
+    let daysTxt = '';
+    if (p.status==='overdue') {
+      daysTxt = `<span style="font-size:11px;font-weight:700;color:var(--danger)">เกิน ${Math.abs(diffDays)} วัน</span>`;
+    } else if (p.status==='current') {
+      daysTxt = diffDays <= 0 ? `<span style="font-size:11px;color:var(--warning);font-weight:600">ถึงกำหนด!</span>` : `<span style="font-size:11px;color:var(--warning)">อีก ${diffDays} วัน</span>`;
+    } else if (p.status==='paid') {
+      daysTxt = `<span style="font-size:11px;color:var(--text3)">${p.paidDate||'-'}</span>`;
+    } else {
+      daysTxt = `<span style="font-size:11px;color:var(--text3)">อีก ${diffDays} วัน</span>`;
+    }
+    const statusTxt = p.status==='paid'?`<span class="badge badge-success">จ่ายแล้ว</span>`
+      :p.status==='overdue'?`<span class="badge badge-danger">ค้างชำระ</span>`
+      :p.status==='current'?`<span class="badge badge-warning">งวดนี้</span>`
+      :`<span style="font-size:11px;color:var(--text3)">รอชำระ</span>`;
+    const prepayTxt = p.prepay > 0 ? `<br><span style="font-size:11px;color:var(--accent)">+โป๊ะ ${p.prepay.toLocaleString()}</span>` : '';
+    return `<tr class="${cls}">
+      <td style="font-weight:600">#${p.installment}</td>
+      <td>${p.due}<br>${daysTxt}</td>
+      <td>${p.total.toLocaleString()}${prepayTxt}</td>
+      <td>${p.ownerPct}%</td>
+      <td>${statusTxt}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('customer-content').innerHTML = `
+    ${dueBanner}
+    ${overdueBadge}
+    <div class="ownership-card" style="margin-bottom:20px">
+      <div class="ownership-top">
+        <div>
+          <div class="ownership-name">${contract.name}</div>
+          <div class="ownership-phone">บ้านของคุณ</div>
+        </div>
+        <div class="ownership-pct">
+          <div class="big">${pct}%</div>
+          <div class="lbl">คุณเป็นเจ้าของแล้ว</div>
+        </div>
+      </div>
+      <div class="ownership-bar"><div class="ownership-bar-fill" style="width:${pct}%"></div></div>
+      <div class="ownership-stats">
+        <div class="ownership-stat"><div class="lbl">ราคาบ้าน</div><div class="val">${contract.price.toLocaleString()} ฿</div></div>
+        <div class="ownership-stat"><div class="lbl">จ่ายไปแล้ว</div><div class="val">${totalPaid.toLocaleString()} ฿</div></div>
+        <div class="ownership-stat"><div class="lbl">เหลืออีก</div><div class="val">${remaining.toLocaleString()} งวด</div></div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      ${payBtn}
+      <button class="btn-action btn-prepay" onclick="openPrepayModal('${phone}')"><i class="ti ti-plus"></i> โป๊ะต้น</button>
+      <button class="btn-action btn-line" onclick="window.open('https://line.me','_blank')"><i class="ti ti-user"></i> ติดต่อเจ้าหน้าที่</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i class="ti ti-list"></i> ประวัติการชำระ</div>
+      <div style="overflow-x:auto">
+        <table class="payments-table">
+          <thead><tr><th>งวด</th><th>ครบกำหนด</th><th>ยอดชำระ</th><th>% เจ้าของ</th><th>สถานะ</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px;font-size:12px;color:var(--text3);text-align:center">หากต้องการแก้ไขข้อมูล กรุณาติดต่อเจ้าหน้าที่ผ่าน <a href="https://line.me" target="_blank" style="color:var(--primary-light);font-weight:600;">Line Official</a> เท่านั้น</div>
+    </div>`;
+}
+
+// ===== MODALS =====
+function openPayModal(phone, installment) {
+  pendingPayPhone = phone;
+  pendingPayInstallment = installment;
+  const pmt = DB.payments.find(p => p.phone===phone && p.installment===installment);
+  const contract = DB.contracts.find(c => c.phone===phone);
+  document.getElementById('modal-pay-body').innerHTML = `
+    <strong>${contract.name}</strong><br>
+    งวดที่ ${installment} | ครบกำหนด ${pmt.due}<br>
+    ยอดชำระ: <strong style="color:var(--success)">${pmt.total.toLocaleString()} บาท</strong><br><br>
+    ยืนยันว่าได้รับชำระเงินแล้ว?`;
+  document.getElementById('modal-pay').classList.add('open');
+}
+
+function confirmPay() {
+  const pmt = DB.payments.find(p => p.phone===pendingPayPhone && p.installment===pendingPayInstallment);
+  if (pmt) {
+    pmt.status = 'paid';
+    pmt.paidDate = new Date().toISOString().split('T')[0];
+    // Set next as current
+    const next = DB.payments.find(p => p.phone===pendingPayPhone && p.installment===pendingPayInstallment+1);
+    if (next && next.status==='upcoming') next.status = 'current';
+  }
+  closeModal('modal-pay');
+  if (currentUser.role === 'admin') renderDetail(pendingPayPhone);
+  else renderCustomer(pendingPayPhone);
+}
+
+function openPrepayModal(phone) {
+  pendingPayPhone = phone;
+  document.getElementById('prepay-amount').value = '';
+  document.getElementById('modal-prepay').classList.add('open');
+}
+
+function confirmPrepay() {
+  const amount = parseInt(document.getElementById('prepay-amount').value);
+  if (!amount || amount <= 0) return alert('กรุณากรอกจำนวนเงิน');
+  const today = new Date().toISOString().split('T')[0];
+  // Find first unpaid
+  const pmt = DB.payments.find(p => p.phone===pendingPayPhone && (p.status==='current'||p.status==='upcoming'));
+  if (pmt) {
+    pmt.prepay += amount;
+    pmt.note = `โป๊ะต้น ${amount.toLocaleString()} บาท เมื่อ ${today}`;
+  }
+  closeModal('modal-prepay');
+  alert(`บันทึกโป๊ะต้น ${amount.toLocaleString()} บาท เรียบร้อยแล้ว\nวันที่: ${today}`);
+  if (currentUser.role === 'admin') renderDetail(pendingPayPhone);
+  else renderCustomer(pendingPayPhone);
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+</script>
+</body>
+</html>
